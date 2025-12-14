@@ -1,8 +1,8 @@
+const { getHealthStatus } = require('../services/healthService');
+
 const healthCheck = (req, res) => {
-    res.status(200).json({
-        status: "OK",
-        message: "Service is running"
-    });
+  const healthData = getHealthStatus();
+    res.status(200).json(healthData);
 };
 module.exports = {
     healthCheck
