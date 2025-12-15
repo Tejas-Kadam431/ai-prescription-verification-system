@@ -1,4 +1,4 @@
-const getHealthStatus = () => {
+const getHealthStatus = async () => {
     const isHealthy = true; // This would normally involve actual health checks
     if(!isHealthy) {
         const error = new Error('Service is unhealthy');

@@ -1,13 +1,10 @@
+const asyncHandler = require("../utils/asyncHandler");
 const { getHealthStatus } = require("../services/healthService");
 
-const healthCheck = (req, res, next) => {
-  try {
-    const healthData = getHealthStatus();
-    res.status(200).json(healthData);
-  } catch (error) {
-    next(error); // send error to error middleware
-  }
-};
+const healthCheck = asyncHandler(async (req, res) => {
+  const healthData = await getHealthStatus();
+  res.status(200).json(healthData);
+});
 
 module.exports = {
   healthCheck
