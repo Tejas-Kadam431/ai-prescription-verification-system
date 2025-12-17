@@ -1,15 +1,25 @@
 const express = require("express");
 const app = express();
+console.log("APP.JS LOADED");
+
+app.get("/ping", (req, res) => {
+  res.json({ pong: true });
+});
 
 const healthRoutes = require("./routes/healthRoutes");
-const errorHandler = require("./middleware/errorHandler");
+const medicineRoutes = require("./routes/medicineRoutes");
+
+
+
 
 app.use(express.json());
 
 // register routes
 app.use("/", healthRoutes);
+app.use("/medicines", medicineRoutes);
 
 // register error handler (MUST be last)
+const errorHandler = require("./middleware/errorHandler");
 app.use(errorHandler);
 
 module.exports = app;
