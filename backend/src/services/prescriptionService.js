@@ -9,8 +9,11 @@ const getAllPrescriptions = async () => {
 };
 
 const getPrescriptionById = async (id) => {
-  return await Prescription.findById(id);
+  return await Prescription
+    .findById(id)
+    .populate("medicines.medicine");
 };
+
 
 module.exports = {
   createPrescription,
