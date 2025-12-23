@@ -4,6 +4,8 @@ const {
   getAllPrescriptions,
   getPrescriptionById,
 } = require("../services/prescriptionService");
+const prescriptionService = require("../services/prescriptionService");
+
 
 const addPrescription = asyncHandler(async (req, res) => {
   const prescription = await createPrescription(req.body);
@@ -23,9 +25,21 @@ const fetchPrescription = asyncHandler(async (req, res) => {
   }
   res.status(200).json(prescription);
 });
+const updatePrescriptionStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+
+  const updated = await prescriptionService.updatePrescriptionStatus(
+    req.params.id,
+    status
+  );
+
+  res.json(updated);
+});
+
 
 module.exports = {
   addPrescription,
   fetchPrescriptions,
   fetchPrescription,
+  updatePrescriptionStatus,
 };
