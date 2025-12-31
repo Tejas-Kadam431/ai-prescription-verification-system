@@ -22,6 +22,15 @@ const prescriptionSchema = new mongoose.Schema(
   ],
   default: "uploaded",
 },
+retryCount: {
+  type: Number,
+  default: 0,
+},
+maxRetries: {
+  type: Number,
+  default: 3,
+},
+
 
 
     medicines: [
