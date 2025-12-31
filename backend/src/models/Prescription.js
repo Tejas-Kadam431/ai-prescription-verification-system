@@ -12,10 +12,17 @@ const prescriptionSchema = new mongoose.Schema(
     },
 
     status: {
-      type: String,
-      enum: ["uploaded", "processed", "verified", "rejected"],
-      default: "uploaded",
-    },
+  type: String,
+  enum: [
+    "uploaded",
+    "processed",
+    "verified",
+    "rejected",
+    "processing_failed",
+  ],
+  default: "uploaded",
+},
+
 
     medicines: [
       {

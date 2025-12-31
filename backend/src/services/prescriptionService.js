@@ -4,9 +4,11 @@ const { processPrescriptionAsync } = require("./prescriptionProcessor");
 const allowedTransitions = {
   uploaded: ["processed", "rejected"],
   processed: ["verified", "rejected"],
+  processing_failed: ["uploaded"], // 👈 retry
   verified: [],
   rejected: [],
 };
+
 
 const createPrescription = async (data) => {
   const prescription = await Prescription.create(data);
