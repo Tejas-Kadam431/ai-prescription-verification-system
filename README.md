@@ -1,4 +1,4 @@
-# AI-Powered Prescription & Meddicine Verification System
+# AI-Powered Prescription & Medicine Verification System
 
 This project aims to build a real-world healthcare system that:
 - Extracts text from medical prescriptions using OCR
