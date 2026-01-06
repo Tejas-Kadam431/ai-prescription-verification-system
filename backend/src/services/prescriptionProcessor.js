@@ -1,43 +1,56 @@
 const Prescription = require("../models/Prescription");
+const { extractTextFromImage } = require("./ocrService");
+const { parsePrescriptionText } = require("./nlpService");
 
 const processPrescriptionAsync = async (prescriptionId) => {
   setTimeout(async () => {
-    const prescription = await Prescription.findById(prescriptionId);
+    try {
+      const prescription = await Prescription.findById(prescriptionId);
+      if (!prescription) return;
 
-    if (!prescription) return;
+      // idempotency guard
+      if (prescription.status !== "uploaded") return;
 
-    // 🔒 idempotency guard
-    if (prescription.status !== "uploaded") {
-      console.log("⏭ Skipping duplicate processing:", prescriptionId);
-      return;
-    }
+      // retry guard
+      if (prescription.retryCount >= prescription.maxRetries) {
+        prescription.status = "rejected";
+        await prescription.save();
+        return;
+      }
 
-    // 🔒 retry guard
-    if (prescription.retryCount >= prescription.maxRetries) {
-      prescription.status = "rejected";
+      prescription.retryCount += 1;
       await prescription.save();
-      console.log("❌ Max retries exceeded:", prescriptionId);
-      return;
-    }
 
-    prescription.retryCount += 1;
-    await prescription.save();
+      // 1️⃣ OCR
+      const ocrResult = await extractTextFromImage(
+        prescription.originalImageUrl
+      );
 
-    const failed = Math.random() < 0.5;
+      if (!ocrResult.text || ocrResult.confidence < 0.7) {
+        prescription.status = "processing_failed";
+        await prescription.save();
+        return;
+      }
 
-    if (failed) {
-      prescription.status = "processing_failed";
+      // 2️⃣ NLP
+      const parsed = await parsePrescriptionText(ocrResult.text);
+
+      if (!parsed.medicines || parsed.medicines.length === 0) {
+        prescription.status = "processing_failed";
+        await prescription.save();
+        return;
+      }
+
+      // 3️⃣ Save extracted medicines
+      prescription.extractedMedicines = parsed.medicines;
+
+      prescription.status = "processed";
       await prescription.save();
-      console.log("⚠️ Processing failed:", prescriptionId);
-      return;
+    } catch (err) {
+      console.error("Async processing error:", err.message);
     }
-
-    prescription.status = "processed";
-    await prescription.save();
-    console.log("✅ Processed:", prescriptionId);
   }, 5000);
 };
-
 
 module.exports = {
   processPrescriptionAsync,
