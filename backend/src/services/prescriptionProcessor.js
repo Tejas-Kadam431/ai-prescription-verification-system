@@ -1,6 +1,8 @@
 const Prescription = require("../models/Prescription");
 const { extractTextFromImage } = require("./ocrService");
 const { parsePrescriptionText } = require("./nlpService");
+const { validateMedicines } = require("./medicineValidationService");
+
 
 const processPrescriptionAsync = async (prescriptionId) => {
   setTimeout(async () => {
