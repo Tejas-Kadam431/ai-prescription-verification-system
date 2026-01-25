@@ -1,14 +1,18 @@
 const express = require("express");
 const router = express.Router();
-const { protect } = require("../middleware/authMiddleware");
-const { authorize } = require("../middleware/roleMiddleware");
 
 const {
   addPrescription,
   fetchPrescriptions,
   fetchPrescription,
+  approvePrescription,
+  rejectPrescription,
   updatePrescriptionStatus,
 } = require("../controllers/prescriptionController");
+
+const { protect } = require("../middleware/authMiddleware");
+const { authorize } = require("../middleware/roleMiddleware");
+
 
 router.patch("/:id/approve",
   protect,

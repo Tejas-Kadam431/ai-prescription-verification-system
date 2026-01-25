@@ -11,7 +11,7 @@ const medicineRoutes = require("./routes/medicineRoutes");
 
 
 const prescriptionRoutes = require("./routes/prescriptionRoutes");
-
+const authRoutes = require("./routes/authRoutes");
 
 
 
@@ -21,6 +21,9 @@ app.use(express.json());
 app.use("/", healthRoutes);
 app.use("/medicines", medicineRoutes);
 app.use("/prescriptions", prescriptionRoutes);
+app.use("/auth", authRoutes);
+
+
 // register error handler (MUST be last)
 const errorHandler = require("./middleware/errorHandler");
 app.use(errorHandler);

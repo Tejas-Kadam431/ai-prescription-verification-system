@@ -1,19 +1,10 @@
 const Prescription = require("../models/Prescription");
 const { processPrescriptionAsync } = require("./prescriptionProcessor");
 
-const allowedTransitions = {
-  uploaded: ["processed", "rejected"],
-  processed: ["verified", "rejected"],
-  processing_failed: ["uploaded"], // 👈 retry
-  verified: [],
-  rejected: [],
-};
-
-
 const createPrescription = async (data) => {
   const prescription = await Prescription.create(data);
 
-  // trigger background processing (DO NOT await)
+  // 🔥 trigger background processing
   processPrescriptionAsync(prescription._id);
 
   return prescription;
@@ -24,7 +15,17 @@ const getAllPrescriptions = async () => {
 };
 
 const getPrescriptionById = async (id) => {
-  return await Prescription.findById(id).populate("medicines.medicine");
+  return await Prescription.findById(id)
+    .populate("medicines.medicine");
+};
+
+const allowedTransitions = {
+  uploaded: ["processed", "rejected", "needs_review", "processing_failed"],
+  processed: ["verified", "rejected"],
+  needs_review: ["verified", "rejected"],
+  verified: [],
+  rejected: [],
+  processing_failed: [],
 };
 
 const updatePrescriptionStatus = async (id, newStatus) => {
@@ -35,9 +36,9 @@ const updatePrescriptionStatus = async (id, newStatus) => {
   }
 
   const currentStatus = prescription.status;
-  const allowed = allowedTransitions[currentStatus] || [];
+  const allowed = allowedTransitions[currentStatus];
 
-  if (!allowed.includes(newStatus)) {
+  if (!allowed || !allowed.includes(newStatus)) {
     throw new Error(
       `Invalid status transition from ${currentStatus} to ${newStatus}`
     );

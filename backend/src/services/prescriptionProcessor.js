@@ -42,6 +42,33 @@ const processPrescriptionAsync = async (prescriptionId) => {
         await prescription.save();
         return;
       }
+      // Run medicine validation
+const validationResult = await validateMedicines(parsed.medicines);
+
+if (validationResult.hasConflicts) {
+  prescription.status = "rejected";
+  prescription.rejectionReason = validationResult.reason;
+  await prescription.save();
+  return;
+}
+
+if (validationResult.needsReview) {
+  prescription.status = "needs_review";
+  prescription.reviewReason = validationResult.reason;
+  prescription.extractedMedicines = parsed.medicines;
+  await prescription.save();
+  return;
+}
+
+// All good
+if (validationResult.isValid) {
+  prescription.status = "processed";
+  prescription.extractedMedicines = parsed.medicines;
+  await prescription.save();
+  return;
+}
+
+      
 
       // 3️⃣ Save extracted medicines
       prescription.extractedMedicines = parsed.medicines;

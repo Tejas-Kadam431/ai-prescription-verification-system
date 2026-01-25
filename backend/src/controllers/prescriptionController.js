@@ -35,6 +35,28 @@ const updatePrescriptionStatus = asyncHandler(async (req, res) => {
 
   res.json(updated);
 });
+const approvePrescription = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const prescription = await approvePrescriptionService(id);
+
+  res.status(200).json({
+    success: true,
+    data: prescription,
+  });
+});
+const rejectPrescription = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { reason } = req.body;
+
+  const prescription = await rejectPrescriptionService(id, reason);
+
+  res.status(200).json({
+    success: true,
+    data: prescription,
+  });
+});
+
 
 
 module.exports = {
@@ -42,4 +64,6 @@ module.exports = {
   fetchPrescriptions,
   fetchPrescription,
   updatePrescriptionStatus,
+  approvePrescription,
+  rejectPrescription,
 };
